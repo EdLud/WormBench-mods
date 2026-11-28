@@ -30,7 +30,6 @@ settle.MOUNDS = {
 settle.FROST_SHARE = 50 -- % of the snow that frosts the land rather than lying on it
 settle.FROST = 10 -- pixels into the land frost reaches, more often near its top
 local FROST_CHECKS = 16 -- frost spots checked a frame for their land blown away
-settle.CHUNK = 128 -- pixels of map width the glow is kept for together
 local CHECKS = 24 -- snowy columns checked a frame for land taken from under them
 local NEAR = 3 -- columns either side checked at once after one changes
 local MELT_CUTS = 40 -- melting cuts a frame at most
@@ -54,17 +53,10 @@ function settle.frame_pixels(f)
 end
 
 -- The snow of a match: by column, the top pixel of its lying snow and how deep it is; the columns in the order they
--- first had snow; the columns to check first; the cuts waiting to melt; the frost spots, in the order laid and by
--- chunk of the map; and each chunk's count of changes, for the glow to follow.
+-- first had snow; the columns to check first; the cuts waiting to melt; and the frost spots, in the order laid.
 function settle.new_state()
   return { cols = {}, order = {}, sweep = 1, urgent = {}, marked = {}, queue = {}, head = 1, due = 0,
-    frost = {}, frosted = {}, chunks = {}, fsweep = 1, changes = {} }
-end
-
--- The glow over column x changes.
-local function touch(s, x)
-  local c = x // settle.CHUNK
-  s.changes[c] = (s.changes[c] or 0) + 1
+    frost = {}, frosted = {}, fsweep = 1 }
 end
 
 -- The first land at or below (x, y), down to the water; nil over the water. WA's trace can stop a pixel short of the
@@ -224,7 +216,6 @@ function settle.check(s, x, water)
   -- Its top, middle and the land under it still there: as it was, without reading every pixel.
   local solid = wa.land.solid
   if solid(x, base) and solid(x, col.top) and solid(x, col.top + col.depth // 2) then return false end
-  touch(s, x)
   local left, run, in_run = 0, 0, true
   for y = base - 1, col.top, -1 do
     if wa.land.solid(x, y) then
@@ -382,7 +373,6 @@ function settle.mound(s, x, y, heights, water)
         s.cols[p.x] = { top = p.top - p.added, depth = p.added }
         s.order[#s.order + 1] = p.x
       end
-      touch(s, p.x)
       laid = laid + p.added
     end
   end
@@ -427,14 +417,9 @@ function settle.frost(s, x, top, big)
   stamp(f, x, y + w - 1)
   local spot = { x = x, y = y, w = w }
   s.frost[#s.frost + 1] = spot
-  local c = x // settle.CHUNK
-  local chunk = s.chunks[c] or {}
-  s.chunks[c] = chunk
-  chunk[#chunk + 1] = spot
   for dx = 0, w - 1 do
     for dy = 0, w - 1 do s.frosted[(y + dy) * 65536 + x + dx] = true end
   end
-  touch(s, x)
   return w * w
 end
 
@@ -448,14 +433,9 @@ function settle.frost_sweep(s)
     else
       s.frost[s.fsweep] = s.frost[#s.frost]
       s.frost[#s.frost] = nil
-      local c = spot.x // settle.CHUNK
-      local kept = {}
-      for _, other in ipairs(s.chunks[c]) do if other ~= spot then kept[#kept + 1] = other end end
-      s.chunks[c] = kept
       for dx = 0, spot.w - 1 do
         for dy = 0, spot.w - 1 do s.frosted[(spot.y + dy) * 65536 + spot.x + dx] = nil end
       end
-      touch(s, spot.x)
     end
   end
 end
@@ -485,7 +465,6 @@ function settle.place(s, x, top, water, reconcile)
     s.cols[px] = { top = py - 1, depth = 1 }
     s.order[#s.order + 1] = px
   end
-  touch(s, px)
   return true
 end
 
@@ -496,7 +475,6 @@ function settle.melt(s, percent)
     if col.depth > 0 and wa.random(1, 100) <= percent then
       s.queue[#s.queue + 1] = { f = settle.STRIP, x = x, bottom = col.top }
       col.top, col.depth = col.top + 1, col.depth - 1
-      touch(s, x)
     end
   end
 end

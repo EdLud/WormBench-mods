@@ -359,7 +359,7 @@ do
   check("the cells across it show only their part above", cut > 0, cut)
   check("the rain sound loops from the start", M.ambient and M.ambient.path == "sounds/rain.wav")
   check("the sheets are loaded with the lightning's",
-    M.assets and #M.assets.sprites == 11 and #M.assets.sounds == 4, M.assets and #M.assets.sprites)
+    M.assets and #M.assets.sprites == 10 and #M.assets.sounds == 4, M.assets and #M.assets.sprites)
 
   new_match({ rain = 40 })
   frames(3)
@@ -915,7 +915,7 @@ do
   check("none stands on air", land.floating() == 0, land.floating())
 end
 
-print("snow: frost in the land, squares and the glow")
+print("snow: frost in the land and squares")
 do
   local land = settling({ snow = 100 }, nil, nil, 100)
   local settle = load_module("lib/settle")
@@ -944,20 +944,17 @@ do
   check("single pixels and 2x2 squares", squares > 0 and squares < #M.stamps, squares .. " of " .. #M.stamps)
   local frost_count = #s.frost
 
-  -- Frost whose land goes is forgotten, and the glow follows.
-  local glow = load_module("lib/glow")
-  local c = 4 -- the chunk from x 512
-  local list = {}
-  local before = glow.boxes(s, c, list)
+  -- Frost whose land goes is forgotten.
   local cut_x0, cut_x1 = 512, 640
+  local before = 0
+  for _, spot in ipairs(s.frost) do if spot.x >= cut_x0 and spot.x < cut_x1 then before = before + 1 end end
   local old_ground = ground
   wa.land.solid = function(x, y) return old_ground(x, y) and not (x >= cut_x0 and x < cut_x1) end
-  check("the glow leaves land blown away at once", glow.boxes(s, c, list) == 0)
   load_module("lib/weather").target.snow = 0
   sim_frames(2 * math.ceil(frost_count / 16))
   local left = 0
   for _, spot in ipairs(s.frost) do if spot.x >= cut_x0 and spot.x < cut_x1 then left = left + 1 end end
-  check("and the simulation forgets that frost", before > 0 and left == 0 and #(s.chunks[c] or {}) == 0, left)
+  check("the simulation forgets frost whose land goes", before > 0 and left == 0, left)
 
   -- Half and half, with the mounds, as the add-on comes: more snow than single pixels lying alone gave.
   -- The committed single pixels laid 4792 in this time over this land, held by the falls a tick.
@@ -974,17 +971,16 @@ do
   local singles, mixed = laid(0, { { { 1 }, 100 } }), laid(50)
   check("mounds bring twice the snow or more", mixed > 2 * singles, mixed .. " vs " .. singles)
 
-  -- The glow: a box on each column's top and each frost spot, drawn on the ground in front of the land.
+  -- Nothing of the snow is drawn on the ground in front of the land: that band costs every frame.
   settling({ snow = 100 }, nil, nil, 50)
   turn(1)
   sim_frames(3000)
   draw()
-  local boxes, depth = 0, nil
+  local ground_band = 0
   for _, q in ipairs(M.quads) do
-    if q.sprite == "sprites/glow.png" then boxes, depth = boxes + q.count, q.depth end
+    if q.depth == wa.depth.TERRAIN - 1 then ground_band = ground_band + 1 end
   end
-  check("snow on screen glows", boxes > 100, boxes)
-  check("on the ground, in front of the land", depth == wa.depth.TERRAIN - 1, depth)
+  check("settled snow draws nothing on the ground band", ground_band == 0, ground_band)
 end
 
 print("snow: melting a little at each clear or rainy turn")

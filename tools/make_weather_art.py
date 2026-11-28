@@ -10,7 +10,6 @@ flat.png    8x8 white: full-view quads coloured per corner.
 flake.png   3 frames of 16x16: soft round snowflakes with a cool edge.
 settle.png  9x9 frames: settling snow, a pixel, a column of pixels or a 2x2
             square each.
-glow.png    16x16: a soft white glow round a pixel of settled snow.
 """
 from pathlib import Path
 
@@ -167,16 +166,6 @@ def settle(size: int = 9) -> None:
     save(np.concatenate(out, axis=0), "settle.png")
 
 
-def glow(size: int = 16) -> None:
-    """A soft white disc fading to nothing at the edge, drawn added over the
-    snow."""
-    yy, xx = np.mgrid[0:size, 0:size].astype(np.float64)
-    c = size / 2 - 0.5
-    d = np.sqrt((xx - c) ** 2 + (yy - c) ** 2) / (size / 2)
-    alpha = np.clip(1 - d, 0, 1) ** 2
-    save(rgba_from_alpha(alpha, np.array([255, 255, 255.0])), "glow.png")
-
-
 if __name__ == "__main__":
     rain()
     splash()
@@ -185,7 +174,6 @@ if __name__ == "__main__":
     flat()
     flake()
     settle()
-    glow()
     for p in sorted(OUT.glob("*.png")):
         with Image.open(p) as img:
             print(p.name, img.size)

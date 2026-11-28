@@ -19,7 +19,7 @@ anywhere on the map, under ledges and in caves too. Half of it builds up as
 land, a pixel or a small mound up to 4 pixels high at a time: worms stand on
 it, dig it and blow it up. It slides off steep steps and drifts at their foot,
 and when the land under it is blown away it falls to the land below. The other half frosts the land up
-to 10 pixels in, and stays. Settled snow has a faint glow. It needs the
+to 10 pixels in, and stays. It needs the
 Direct3D 9 (shader) renderer to show white; without it, settled snow takes the
 nearest colour of the land.
 
