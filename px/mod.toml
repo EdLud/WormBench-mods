@@ -12,7 +12,7 @@
 # Development tests and their match setup live outside this pack, in tests/px/.
 id = "px.ports"
 name = "Project X ports"
-version = "0.20.112"
+version = "0.20.113"
 author = "Project X authors"
 api_version = 5
 format_version = 2
@@ -1958,6 +1958,17 @@ description = "Place a fan that blows for a few turns: 1 to 5 set its force, + s
 entry = "components/weapon.lua"
 icon = "sprites/fan/ico_fan.png"
 default_position = { row = "F12", column = 3 }
+
+[[components]]
+id = "px.stone"
+type = "weapon"
+name = "Stone"
+authors = ["StepS"]
+credits = "improved by 0rang3"
+description = "A slingshot: the stone hurts by how fast it hits, then stays where it comes to rest."
+entry = "components/weapon.lua"
+icon = "sprites/stone/icon.png"
+default_position = { row = "F4", column = 10 }
 
 [[components]]
 id = "px.3_girder_pack"

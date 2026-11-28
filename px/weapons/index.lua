@@ -74,6 +74,7 @@ return {
   ["px.super_drill"] = "weapons/super_drill",
   ["px.super_gravedigger"] = "weapons/super_gravedigger",
   ["px.super_tele"] = "weapons/super_tele",
+  ["px.stone"] = "weapons/stone",
   ["px.swim_suit"] = "weapons/swim_suit",
   ["px.thumper_nade"] = "weapons/thumper_nade",
   ["px.toxic_grenade"] = "weapons/toxic_grenade",
