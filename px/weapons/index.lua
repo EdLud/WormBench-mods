@@ -33,6 +33,7 @@ return {
   ["px.gravler_strike"] = "weapons/gravler_strike",
   ["px.hang_glider"] = "weapons/hang_glider",
   ["px.wings"] = "weapons/wings",
+  ["px.umbrella"] = "weapons/umbrella",
   ["px.helicopter"] = "weapons/helicopter",
   ["px.hellish_hand_grenade"] = "weapons/hellish_hand_grenade",
   ["px.hot_air_balloon"] = "weapons/hot_air_balloon",

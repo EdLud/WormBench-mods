@@ -12,7 +12,7 @@
 # Development tests and their match setup live outside this pack, in tests/px/.
 id = "px.ports"
 name = "Project X ports"
-version = "0.20.111"
+version = "0.20.112"
 author = "Project X authors"
 api_version = 5
 format_version = 2
@@ -2028,6 +2028,18 @@ description = "Fly the worm in any direction with the arrow keys, free of gravit
 entry = "components/weapon.lua"
 icon = "sprites/wings/icon.png"
 default_position = { row = "F8", column = 9 }
+
+[components.suggests."hl.rules"]
+pool = "movement"
+
+[[components]]
+id = "px.umbrella"
+type = "weapon"
+name = "Umbrella"
+description = "A parachute that the wind blows twice as hard."
+entry = "components/weapon.lua"
+icon = "sprites/umbrella/icon.png"
+default_position = { row = "F8", column = 10 }
 
 [components.suggests."hl.rules"]
 pool = "movement"
